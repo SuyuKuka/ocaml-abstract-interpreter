@@ -14,6 +14,10 @@ type instruction =
 | Either of program * program 
 and program = instruction list
 
+(* is_deterministic : program -> bool 
+  Parcours la liste si on trouve un Either retourne false,
+  sinon déroule la liste jusqu'a la fin et renvoie true.
+*)
 let is_deterministic (prog : program) : bool =
   let rec aux prog = 
     match prog with 
@@ -24,8 +28,22 @@ let is_deterministic (prog : program) : bool =
   in aux prog
 ;;
 
-let unfold_repeat (prog : program) : program =
-  
+(*  unfold_repeat : program -> program
+  Parcours la liste pour déterminer si on a un Repeat,
+  si on en trouve un on crée une liste d'instruction de Move pour supprimer le Repeat,
+  puis on l'a concatene avec le reste de la liste. *)
+let unfold_repeat (prog : program) : program = 
+  let rec unfold i prog list =
+    if i <= 0 then list
+    else unfold (i - 1) prog (list @ prog)
+  in
+  let rec aux prog = 
+    match prog with 
+    | [] -> prog
+    | Move t :: q -> Move t :: aux q
+    | Repeat (i, p) :: q -> unfold i p [] @ aux q
+    | Either (_, _) :: _ -> failwith "Programme non déterministe"
+  in aux prog
 ;;
 
 let run_det (prog : program) (p : point) : point list =
