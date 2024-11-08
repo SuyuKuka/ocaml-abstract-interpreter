@@ -10,21 +10,22 @@ type transformation =
 
 type instruction =
   Move of transformation
-| Repeat of int program
+| Repeat of int * program
 | Either of program * program 
 and program = instruction list
 
-let isdeterministic (prog : program) : bool =
+let is_deterministic (prog : program) : bool =
   let rec aux prog = 
     match prog with 
     | [] -> true
-    | Move  :: q -> aux q
-    | Repeat (, p) :: q -> aux p && aux q
-    | Either (, ) ::  -> false
+    | Move _ :: q -> aux q
+    | Repeat (_, p) :: q -> aux p && aux q
+    | Either (_, _) :: _ -> false
+  in aux prog
 ;;
 
 let unfold_repeat (prog : program) : program =
-
+  
 ;;
 
 let run_det (prog : program) (p : point) : point list =

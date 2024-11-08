@@ -10,7 +10,7 @@ type vector = coord2D
 type angle = float
 
 let translate (v : vector) (p : point) : point =
-  { x = p.x +. u.x; y = p.y +. u.y }
+  { x = p.x +. v.x; y = p.y +. v.y }
   ;;
 
 let rad_of_deg (a : angle) : angle =
@@ -35,8 +35,8 @@ type transformation =
 
 let transform (t : transformation) (p : point) : point =
   match t with
-  | Translation vect -> translate vect p
-  | Rotation (c, alpha) -> rotate c alpha p
+  | Translate vect -> translate vect p
+  | Rotate (c, alpha) -> rotate c alpha p
 ;;
 
 type rectangle = {
