@@ -72,12 +72,34 @@ let in_rectangle (r : rectangle) (p : point) : bool =
   r.y_min <= p.y && p.y <= r.y_max
 ;;
 
-(3.5 | corners : rectangle -> point list
+(* 3.5 | corners : rectangle -> point list
 * Renvoie la liste des sommets du rectangle r.
 *)
 let corners (r :rectangle) : point list =
   [ {x=r.x_min; y=r.y_max}; {x=r.x_max; y=r.y_max}; {x=r.x_max; y=r.y_min}; {x=r.x_min; y=r.y_min} ]
 ;; (* Nommer les points [a,b,c,d] ? *)
-  
+
+(* 3.6 | rectangle_of_list : point list -> rectangle
+* Renvoie le plus petit rectangle contenant tous les points de la liste,
+* soit le plus grand rectangle possible avec les points de pl.
+* -> Si pl est vide, erreur.
+* -> Sinon, on utilise List.fold.left afin de calculer
+*    les valeurs min et max possibles de x et y dans la liste.
+* Dans pl, avec "fun(xmin, xmax, ymin, ymax) p" on:
+*  - Compare xmin/p.x et ymin/p.y, garde le plus petit.
+*  - Compare xmax/p.x et ymax/p.y, garde le plus grand.
+*)
 let rectangle_of_list (pl : point list) : rectangle = 
-  failwith "À compléter"
+  (* Si pl vide *)
+  if pl = [] then failwith "Erreur : liste de points vide.";
+  match pl with
+  | [p] -> {x_min = p.x; x_max = p.x; y_min = p.y; y_max = p.y} (* Si pl que 1 point | cas useless ? *)
+  | _ -> (* Sinon, cas classique *)
+      let first = List.hd pl in (* Init les val de base à partir du 1er point de pl *)
+      let (x_min, x_max, y_min, y_max) =
+        List.fold_left (fun (xmin, xmax, ymin, ymax) p ->
+            (Float.min xmin p.x, Float.max xmax p.x, Float.min ymin p.y, Float.max ymax p.y)
+          ) (first.x, first.x, first.y, first.y) pl
+      in
+      { x_min = x_min; x_max = x_max; y_min = y_min; y_max = y_max } (* Construction du rectangle *)
+;;
