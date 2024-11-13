@@ -69,13 +69,8 @@ let run_det (prog : program) (p : point) : point list =
  * On va prendre le dernier point visité et on regarde si ce point est dans le rectangle,
  * si oui renvoie true, sinon false.
  *)
-let target_reached_det (prog : program) (p : point) (target : rectangle) : bool =
-  let rec last_pos (l : point list) =
-    match l with 
-    | [] -> failwith "Erreur : liste vide"
-    | [p] -> p
-    | _ :: q -> last_pos q
-  in in_rectangle target (last_pos (run_det prog p))
+let target_reached_det (prog : program) (p : point) (target : rectangle) : bool = 
+  in_rectangle target (List.hd (List.rev (run_det prog p)))
 ;;
   
 
