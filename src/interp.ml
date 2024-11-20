@@ -19,7 +19,7 @@ and program = instruction list
  * sinon déroule la liste jusqu'a la fin et renvoie true.
  *)
 let is_deterministic (prog : program) : bool =
-  let rec aux (prog : program) = 
+  let rec aux (prog : program) : bool = 
     match prog with 
     | [] -> true
     | Move _ :: q -> aux q
@@ -32,18 +32,20 @@ let is_deterministic (prog : program) : bool =
  * Parcours la liste pour déterminer si on a un Repeat,
  * si on en trouve un on crée une liste d'instruction de Move pour supprimer le Repeat,
  * puis on l'a concatene avec le reste de la liste.
+ * Si on a un Either, pour la premiere partie du projet on leve une exception avec failwith
+ * Sinon on ajoute le Either dans la liste
  *)
 let unfold_repeat (prog : program) : program = 
-  let rec unfold (i : int) (prog : program) (list : instruction list) =
+  let rec unfold (i : int) (prog : program) (list : instruction list) : instruction list =
     if i <= 0 then list
     else unfold (i - 1) prog (list @ prog)
   in
-  let rec aux (prog : program) = 
+  let rec aux (prog : program) : program = 
     match prog with 
     | [] -> prog
     | Move t :: q -> Move t :: aux q
     | Repeat (i, p) :: q -> unfold i p [] @ aux q
-    | Either (_, _) :: _ -> failwith "Erreur : Programme non déterministe"
+    | Either (p1, p2) :: q -> Either (p1, p2) :: aux q
   in aux prog
 ;;
 
@@ -55,7 +57,7 @@ let unfold_repeat (prog : program) : program =
  * ma position courante par le nouveau, et a la fin on reverse la liste de point.
  *)
 let run_det (prog : program) (p : point) : point list =
-  let rec aux (prog : program) (p : point) (l : point list) = 
+  let rec aux (prog : program) (p : point) (l : point list) : point list = 
     match prog with
     | [] -> l
     | Move t :: q -> aux q (transform t p) (transform t p :: l)
@@ -75,7 +77,16 @@ let target_reached_det (prog : program) (p : point) (target : rectangle) : bool 
   
 
 let run (prog : program) (p : point) : point list =
-  failwith "À compléter"
+  let rec aux (prog : program) (p : point) (l : point list) : point list = 
+    match prog with
+    | [] -> l
+    | Move t :: q -> aux q (transform t p) (transform t p :: l)
+    | Repeat (_, _) :: _ -> failwith "Erreur : unfold_repeat"
+    | Either (p1, p2) :: q -> 
+      if (Random.bool()) then aux p1 p l
+      else aux p2 p l
+  in List.rev (aux (unfold_repeat prog) p [p])
+;;
 
 let all_choices (prog : program) : program list =
   failwith "À compléter"
