@@ -14,7 +14,7 @@ type angle = float
 *)
 let translate (v : vector) (p : point) : point =
   { x = p.x +. v.x; y = p.y +. v.y }
-  ;;
+;;
 
 (* 3.1 | rad_of_deg : angle -> angle
 * Conversion radians -> degrés
