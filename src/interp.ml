@@ -104,13 +104,14 @@ let rec all_choices (prog : program) : program list =
   let rec aux (prog : program) : program list =
     match prog with
     | [] -> [[]] 
-    | Move t :: q -> List.map (fun rest -> Move t :: rest) (aux q)
-    | Repeat (_, _) :: _ -> failwith "Erreur : unfold_repeat"
-    | Either (p1, p2) :: q -> let choices_p1 = all_choices p1
-      in let choices_p2 = all_choices p2 
-      in let all_choices_p1 = List.flatten (List.map (fun choice -> List.map (fun rest -> choice @ rest) (aux q)) choices_p1)
-      in let all_choices_p2 = List.flatten (List.map (fun choice -> List.map (fun rest -> choice @ rest) (aux q)) choices_p2)
-      in all_choices_p1 @ all_choices_p2
+    | instruc :: p' ->
+      match instruc with
+      | Move (transformation) -> List.map (fun rest -> instruc :: rest) (aux p')
+      | Repeat (_, _) -> failwith "Erreur : unfold_repeat"
+      | Either (p1, p2) ->
+        let choices_p1 = aux (p1 @ p') in
+        let choices_p2 = aux (p2 @ p') in
+        choices_p1 @ choices_p2
   in List.rev (aux (unfold_repeat prog))
 ;;
 
@@ -120,11 +121,13 @@ let rec all_choices (prog : program) : program list =
  * si oui renvoie true, sinon false.
 *)
 let target_reached (prog : program) (p : point) (r : rectangle) : bool =
-  let rec aux (l : program list) : bool = 
-    match l with
-    | [] -> false
-    | h :: q ->
-      if in_rectangle r (List.hd (List.rev (run h p))) then true
-      else aux q
-  in aux (all_choices prog)
+  if not (in_rectangle r p) && prog == [] then false
+  else
+    let rec aux (l : program list) : bool = 
+      match l with
+      | [] -> true
+      | h :: q ->
+        if not (in_rectangle r (List.hd (List.rev (run h p)))) then false
+        else aux q
+    in aux (all_choices prog)
 ;;
