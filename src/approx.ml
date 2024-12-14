@@ -3,11 +3,17 @@ open Interp
 
 (* Code de la Section 5 du projet. *)
 
+(** [sample : rectangle -> point]
+  * Renvoie un point au hasard dans le rectangle r.
+  *)
 let sample (rect : rectangle) : point =
   { x = rect.x_min +. Random.float (rect.x_max -. rect.x_min);
     y = rect.y_min +. Random.float (rect.y_max -. rect.y_min) }
 ;;
-  
+
+(** [transform_rect : transformation -> rectangle -> rectangle]
+  * Renvoie le rectangle r transformé par la transformation t.
+  *)  
 let transform_rect (t : transformation) (r : rectangle) : rectangle =
   match t with 
   | Translate vect -> 
@@ -21,6 +27,10 @@ let transform_rect (t : transformation) (r : rectangle) : rectangle =
     in rectangle_of_list rotate_points
 ;;
 
+
+(** [run_rect : program -> rectangle -> rectangle list]
+  * Renvoie la liste des rectangles visités par le robot.
+  *)
 let run_rect (prog : program) (r : rectangle) : rectangle list =
   let rec aux (prog : program) (r : rectangle) : rectangle list =
     match prog with 
@@ -43,13 +53,20 @@ let run_rect (prog : program) (r : rectangle) : rectangle list =
   in List.rev (aux prog r)
 ;;
 
+(** [inclusion : rectangle -> rectangle -> bool]
+  * Renvoie true si r est inclus dans t, false sinon.
+  *)
 let inclusion (r : rectangle) (t : rectangle) : bool =
   t.x_min <= r.x_min && r.x_max <= t.x_max
   && t.y_min <= r.y_min && r.y_max <= t.y_max
 ;;
 
+(** [target_reached_rect : program -> rectangle -> rectangle -> bool]
+  * Renvoie true si le rectangle r est inclus dans le rectangle target, false sinon.
+  *)
 let target_reached_rect (prog : program) (r : rectangle) (target : rectangle) : bool =
-  failwith "À compléter"
+  
+;;
 
 let run_polymorphe (transform : transformation -> 'a -> 'a) (prog : program) (i : 'a) : 'a list =
   failwith "À compléter"
