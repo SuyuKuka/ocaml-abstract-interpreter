@@ -80,7 +80,25 @@ let target_reached_rect (prog : program) (r : rectangle) (target : rectangle) : 
 ;;
 
 let run_polymorphe (transform : transformation -> 'a -> 'a) (prog : program) (i : 'a) : 'a list =
-  failwith "À compléter"
+  let rec aux (prog : program) (state : 'a) (states : 'a list) : 'a list =
+    match prog with
+    | [] -> states (* Cas de base :  programme vide, return les états accumulés *)
+    | Move t :: q -> (* Cas Move : applique transformation t à l'état courant *)
+        let new_state = f t state in
+        aux q new_state (new_state :: states)
+    | Repeat (n, prog') :: q ->
+        let unfolded_prog = (* On déroule les repeats n fois *) 
+          let rec n_repeat_prog n (prog : program) =
+            if n = 0 then []
+            else prog @ n_repeat_prog (n - 1) prog
+          in n_repeat_prog n prog'
+        in aux (unfolded_prog @ q) state states (* exécute le programme déroulé suivi du reste du programme *)
+    | Either (p1, p2) :: q -> (* Cas Either : on choisit random entre deux sous-programmes *)
+        if Random.bool () 
+        then aux (p1 @ q) state states
+        else aux (p2 @ q) state states
+  in List.rev (aux prog init [init]) (* Inverse la liste pour return les états dans le bon ordre *)
+;;
 
 let rec over_approximate (prog : program) (r : rectangle) : rectangle =
   failwith "À compléter"
