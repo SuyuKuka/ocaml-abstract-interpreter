@@ -1,5 +1,11 @@
 (tests
   (names test)
+<<<<<<< HEAD
   (libraries fmt alcotest pf5)
   ;;(flags (:standard -open Pf5))
+=======
+  (libraries fmt alcotest pf5 graphics)
+  (flags (:standard -open Pf5))
+>>>>>>> c6c7aeb (sujet + readline pour l'interpreteur + implementation du graphics dans le projet)
 )
+
