@@ -101,7 +101,37 @@ let run_polymorphe (transform : transformation -> 'a -> 'a) (prog : program) (i 
 ;;
 
 let rec over_approximate (prog : program) (r : rectangle) : rectangle =
-  failwith "À compléter"
+  let rec aux (prog : program) (r : rectangle) : rectangle =
+    match prog with
+    | [] -> r (* Si programme vide, on return le rectangle inchangé *)
+    | Move t :: q -> 
+        let new_r = transform_rect t r in (* Applique la transform_rect au rectangle actuel et continuer avec le reste *)
+        aux q new_r
+    | Repeat (n, prog') :: q ->
+        let rec repeat_rect n r =
+          if n = 0 then r
+          else (* Calcul du rectangle après une itération du sous-programme *)
+            let next_r = aux prog' r in (* Fusion avec le rectangle initial *)
+            {
+              x_min = Float.min r.x_min next_r.x_min;
+              x_max = Float.max r.x_max next_r.x_max;
+              y_min = Float.min r.y_min next_r.y_min;
+              y_max = Float.max r.y_max next_r.y_max;
+            }
+            |> repeat_rect (n - 1)
+        in
+        aux q (repeat_rect n r) (* Applique les répétitions, puis continuer avec le reste du programme *)
+    | Either (p1, p2) :: q -> (* Calcule les rectangles atteints par les 2 branches *)
+        let r1 = aux p1 r in
+        let r2 = aux p2 r in
+        let combined_r = { (* Calcule le + petit rectangle contenant les deux *)
+          x_min = Float.min r1.x_min r2.x_min;
+          x_max = Float.max r1.x_max r2.x_max;
+          y_min = Float.min r1.y_min r2.y_min;
+          y_max = Float.max r1.y_max r2.y_max;
+        } in aux q combined_r
+  in aux prog r
+;;
 
 let feasible_target_reached (prog : program) (r : rectangle) (target : rectangle) : bool =
   failwith "À compléter"
