@@ -84,7 +84,7 @@ let run_polymorphe (transform : transformation -> 'a -> 'a) (prog : program) (i 
     match prog with
     | [] -> states (* Cas de base :  programme vide, return les états accumulés *)
     | Move t :: q -> (* Cas Move : applique transformation t à l'état courant *)
-        let new_state = f t state in
+        let new_state = transform t state in
         aux q new_state (new_state :: states)
     | Repeat (n, prog') :: q ->
         let unfolded_prog = (* On déroule les repeats n fois *) 
@@ -97,7 +97,7 @@ let run_polymorphe (transform : transformation -> 'a -> 'a) (prog : program) (i 
         if Random.bool () 
         then aux (p1 @ q) state states
         else aux (p2 @ q) state states
-  in List.rev (aux prog init [init]) (* Inverse la liste pour return les états dans le bon ordre *)
+  in List.rev (aux prog i [i]) (* Inverse la liste pour return les états dans le bon ordre *)
 ;;
 
 let rec over_approximate (prog : program) (r : rectangle) : rectangle =
@@ -105,7 +105,7 @@ let rec over_approximate (prog : program) (r : rectangle) : rectangle =
     match prog with
     | [] -> r (* Si programme vide, on return le rectangle inchangé *)
     | Move t :: q -> 
-        let new_r = transform_rect t r in (* Applique la transform_rect au rectangle actuel et continuer avec le reste *)
+        let new_r = transform_rect t r in (* Applique la transform_rect au rectangle actuel et continue avec le reste *)
         aux q new_r
     | Repeat (n, prog') :: q ->
         let rec repeat_rect n r =
@@ -134,10 +134,10 @@ let rec over_approximate (prog : program) (r : rectangle) : rectangle =
 ;;
 
 let feasible_target_reached (prog : program) (r : rectangle) (target : rectangle) : bool =
-  let r_final = over_approximate prog r_init in
+  let r_final = over_approximate prog r in
   (* Check si un rectangle est inclus dans un autre *)
-  r_final.x_min >= r_target.x_min &&
-  r_final.x_max <= r_target.x_max &&
-  r_final.y_min >= r_target.y_min &&
-  r_final.y_max <= r_target.y_max
+  r_final.x_min >= target.x_min &&
+  r_final.x_max <= target.x_max &&
+  r_final.y_min >= target.y_min &&
+  r_final.y_max <= target.y_max
 ;;
