@@ -103,34 +103,32 @@ let run_polymorphe (transform : transformation -> 'a -> 'a) (prog : program) (i 
 let rec over_approximate (prog : program) (r : rectangle) : rectangle =
   let rec aux (prog : program) (r : rectangle) : rectangle =
     match prog with
-    | [] -> r (* Si programme vide, on return le rectangle inchangé *)
-    | Move t :: q -> 
-        let new_r = transform_rect t r in (* Applique la transform_rect au rectangle actuel et continue avec le reste *)
-        aux q new_r
+    | [] -> r (* Si le programme est vide, return le rectangle inchangé *) 
+    | Move t :: q ->
+        let new_r = transform_rect t r in (* Applique transformation Move au rectangle courant et continue avec le reste du programme *)
+        aux q new_r 
     | Repeat (n, prog') :: q ->
-        let rec repeat_rect n r =
-          if n = 0 then r
-          else (* Calcul du rectangle après une itération du sous-programme *)
-            let next_r = aux prog' r in (* Fusion avec le rectangle initial *)
-            {
-              x_min = Float.min r.x_min next_r.x_min;
-              x_max = Float.max r.x_max next_r.x_max;
-              y_min = Float.min r.y_min next_r.y_min;
-              y_max = Float.max r.y_max next_r.y_max;
-            }
-            |> repeat_rect (n - 1)
+        (* Gestion des repeat du sous-programme prog' *)
+        let rec repeat_rect n current_r =
+          if n = 0 then current_r (* Si aucune répétition restante, on return rectangle courant *)
+          else (* Applique sous-programme à l'itération courante *)
+            let next_r = aux prog' current_r in
+            repeat_rect (n - 1) next_r (* Continue avec le rectangle transformé *)
         in
-        aux q (repeat_rect n r) (* Applique les répétitions, puis continuer avec le reste du programme *)
-    | Either (p1, p2) :: q -> (* Calcule les rectangles atteints par les 2 branches *)
-        let r1 = aux p1 r in
-        let r2 = aux p2 r in
-        let combined_r = { (* Calcule le + petit rectangle contenant les deux *)
+        let repeated_r = repeat_rect n r in (* Applique les répétitions au rectangle courant, puis continue avec le reste du programme *)
+        aux q repeated_r 
+    | Either (p1, p2) :: q -> (* Gestion alternatives entre sous-programmes p1 et p2 *)
+        let r1 = aux p1 r in (* Rectangle atteint par 1er chemin *)
+        let r2 = aux p2 r in (* Rectangle atteint par 2eme chemin *)
+        let combined_r = { (* Combine les 2 rectangles en prenant le plus grand englobant *)
           x_min = Float.min r1.x_min r2.x_min;
           x_max = Float.max r1.x_max r2.x_max;
           y_min = Float.min r1.y_min r2.y_min;
           y_max = Float.max r1.y_max r2.y_max;
-        } in aux q combined_r
-  in aux prog r
+        } in
+        aux q combined_r (* Continue avec le reste du programme après la combinaison *)
+  in
+  aux prog r (* Appelle la fonction aux avec programme complet & rectangle initial *)
 ;;
 
 let feasible_target_reached (prog : program) (r : rectangle) (target : rectangle) : bool =
