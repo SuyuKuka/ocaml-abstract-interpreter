@@ -84,15 +84,17 @@ let parse_command (args : string list) : command =
         in { cmd; options = parse_options options; program }
 ;;
 
-let read_cmd () =
+let read_cmd () : command =
   print_endline "interp [OPTIONS] [PROG] :";
-  let input = read_line () 
-  in let args = String.split_on_char ' ' input 
-  in let command = parse_command args 
-  in Printf.printf "Command : %s\n" command.cmd;
+  let input = read_line () in
+  let args = String.split_on_char ' ' input in
+  let command = parse_command args in
+  (* Affichage des résultats pour debug ou vérification *)
+  Printf.printf "Command : %s\n" command.cmd;
   List.iter (fun opt ->
     Printf.printf "Option : %s\n" opt.name;
     Printf.printf "Arguments : %s\n" (String.concat ", " opt.arguments)
   ) command.options;
-  Printf.printf "Program : %s\n" command.program
-;;
+  Printf.printf "Program : %s\n" command.program;
+  command
+  ;;
