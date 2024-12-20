@@ -134,4 +134,10 @@ let rec over_approximate (prog : program) (r : rectangle) : rectangle =
 ;;
 
 let feasible_target_reached (prog : program) (r : rectangle) (target : rectangle) : bool =
-  failwith "À compléter"
+  let r_final = over_approximate prog r_init in
+  (* Check si un rectangle est inclus dans un autre *)
+  r_final.x_min >= r_target.x_min &&
+  r_final.x_max <= r_target.x_max &&
+  r_final.y_min >= r_target.y_min &&
+  r_final.y_max <= r_target.y_max
+;;
