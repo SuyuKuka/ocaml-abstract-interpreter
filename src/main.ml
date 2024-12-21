@@ -1,16 +1,10 @@
 open Read;;
 open Display;;
+open Exec;;
 
 let main () =
-  let command = Read.read_cmd () in
-
-  let (width, height) =
-    match List.find_opt (fun opt -> opt.name = "-size") command.options with
-    | Some size_option ->
-        (match size_option.arguments with
-         | [w; h] -> (int_of_string w, int_of_string h)
-         | _ -> failwith "Invalid arguments")
-    | None -> (600, 400)
-  in init_window width height;
-  draw_point 100 100;
+  let command = Read.read_cmd () 
+  in configure_display command;
+  (* let state = init_state program { x = 0.0; y = 0.0 }
+  in run_program state 0.5; *)
 ;;
