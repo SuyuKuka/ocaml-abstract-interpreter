@@ -89,7 +89,6 @@ let read_cmd () : command =
   let input = read_line () in
   let args = String.split_on_char ' ' input in
   let command = parse_command args in
-  (* Affichage des résultats pour debug ou vérification *)
   Printf.printf "Command : %s\n" command.cmd;
   List.iter (fun opt ->
     Printf.printf "Option : %s\n" opt.name;
