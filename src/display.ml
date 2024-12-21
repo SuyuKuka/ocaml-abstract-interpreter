@@ -41,12 +41,12 @@ let draw_axes (width : int) (height : int) (scale : int) : unit =
 ;;
 
 let draw_point (x : int) (y : int) : unit =
-  set_color red;
+  set_color blue;
   fill_circle x y 5
 ;;
 
 let draw_rectangle (rect : rectangle) : unit =
-  set_color blue;
+  set_color red;
   draw_rect
     (int_of_float rect.x_min)
     (int_of_float rect.y_min)
@@ -87,7 +87,30 @@ let configure_display (cmd : command) : unit =
     | Some size_option ->
         (match size_option.arguments with
          | [w; h] -> (int_of_string w, int_of_string h)
-         | _ -> failwith "Invalid arguments")
+         | _ -> failwith "Invalid arguments for -size")
     | None -> (1500, 900)
   in init_window width height cmd;
+
+  let (x_min, y_min, x_max, y_max) =
+    match List.find_opt (fun opt -> opt.name = "-abs") cmd.options with
+    | Some abs_option -> 
+        (match abs_option.arguments with
+        | [x_min; y_min; x_max; y_max] ->
+            let x_min = int_of_string x_min
+            and y_min = int_of_string y_min
+            and x_max = int_of_string x_max
+            and y_max = int_of_string y_max in
+            if not (x_min <= 0 && 0 <= x_max && y_min <= 0 && 0 <= y_max) then
+              failwith "Rectangle must contain (0,0)"
+            else
+              (x_min, y_min, x_max, y_max)
+        | _ -> failwith "Invalid arguments for -abs")
+    | None -> (0, 0, 100, 100) 
+  in
+    if x_min <> 0 && y_min <> 0 && x_max <> 0 && y_max <> 0 then
+      draw_rectangle { x_min = float_of_int x_min; x_max = float_of_int x_max; y_min = float_of_int y_min; y_max = float_of_int y_max };
+
+  match List.find_opt (fun opt -> opt.name = "-cr") cmd.options with
+  | Some _ -> draw_point 0 0 
+  | None -> ();
 ;;
