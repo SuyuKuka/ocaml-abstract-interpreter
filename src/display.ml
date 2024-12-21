@@ -2,34 +2,38 @@ open Graphics;;
 open Read;;
 open Geo;;
 
-let draw_axes (width : float) (height : float) (scale : int) : unit =
-  let center_x = int_of_float (width /. 2.) 
-  in let center_y = int_of_float (height /. 2.) 
+let draw_axes (width : int) (height : int) (scale : int) : unit =
+  let center_x = width / 2
+  in let center_y = height / 2 
   in set_color black;
 
   moveto 0 center_y;
-  lineto (int_of_float width) center_y;
+  lineto width center_y;
 
   moveto center_x 0;
-  lineto center_x (int_of_float height);
+  lineto center_x height;
 
-  for x = 0 to int_of_float width do
-    if x mod (scale) = 0 then (
+  for x = 0 to width do
+    if (x - center_x) mod (scale) = 0 then (
       moveto x (center_y - 5);
       lineto x (center_y + 5);
 
-      moveto x (center_y - 20);
-      draw_string (string_of_float ((float_of_int x -. width /. 2.) /. float_of_int scale))
+      moveto (x - 5) (center_y - 25);
+      let value = float_of_int ((x - center_x) / scale) 
+      in if x <> center_x then 
+        draw_string (string_of_float value)
     )
   done;
 
-  for y = 0 to int_of_float height do
-    if y mod (scale) = 0 then (
+  for y = 0 to height do
+    if (y - center_y) mod (scale) = 0 then (
       moveto (center_x - 5) y;
       lineto (center_x + 5) y; 
 
-      moveto (center_x - 30) y;
-      draw_string (string_of_float ((float_of_int y -. height /. 2.) /. float_of_int scale))
+      moveto (center_x - 25) y;
+      let value = float_of_int ((y - center_y) / scale)
+      in if y <> center_y then 
+        draw_string (string_of_float value)
     )
   done;
 
@@ -50,8 +54,8 @@ let draw_rectangle (rect : rectangle) : unit =
     (int_of_float (rect.y_max -. rect.y_min))
 ;;
 
-let init_window (width : float) (height : float) (cmd : command) : unit =
-  open_graph (" " ^ string_of_float width ^ "x" ^ string_of_float height);
+let init_window (width : int) (height : int) (cmd : command) : unit =
+  open_graph (" " ^ string_of_int width ^ "x" ^ string_of_int height);
   set_window_title "Exececution pas a pas du programme";
   let (r, g, b) = match List.find_opt (fun opt -> opt.name = "-bc") cmd.options with
     | Some color_option ->
@@ -61,7 +65,7 @@ let init_window (width : float) (height : float) (cmd : command) : unit =
     | None -> (255, 255, 255)
   in let background_color = rgb r g b in
   set_color background_color; 
-  fill_rect 0 0 (int_of_float width) (int_of_float height);
+  fill_rect 0 0 width height;
 
   let (r, g, b) = match List.find_opt (fun opt -> opt.name = "-fc") cmd.options with
     | Some color_option ->
@@ -84,6 +88,6 @@ let configure_display (cmd : command) : unit =
         (match size_option.arguments with
          | [w; h] -> (int_of_string w, int_of_string h)
          | _ -> failwith "Invalid arguments")
-    | None -> (600, 400)
-  in init_window (float_of_int width) (float_of_int height) cmd;
+    | None -> (1500, 900)
+  in init_window width height cmd;
 ;;
