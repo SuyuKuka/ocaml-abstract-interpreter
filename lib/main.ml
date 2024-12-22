@@ -10,6 +10,7 @@ let main () =
 
 <<<<<<< HEAD:lib/main.ml
 <<<<<<< HEAD:lib/main.ml
+<<<<<<< HEAD:lib/main.ml
   let selected_prog =
 =======
   (* let state = init_state program { x = 0.0; y = 0.0 }
@@ -24,6 +25,8 @@ let main () =
   Tout ce qui se situe dans le main après cette ligne n'est "exécuté" que après que la fenêtre soit fermée, ce qui cause les erreurs.
   *)
 
+=======
+>>>>>>> 181c66a (Logique exécution des programmes (pb de repeat résolu), reste affichage):src/main.ml
   let selected_prog =
 >>>>>>> c3b4855 (Pb de bloquage fenêtre trouvé, juste pb d'affichage):src/main.ml
     match command.program with
@@ -42,12 +45,17 @@ let main () =
   Exec.run_program initial_state 0.5;
 
 <<<<<<< HEAD:lib/main.ml
+<<<<<<< HEAD:lib/main.ml
   exit 0
   *)
 >>>>>>> 3614463 (Commentaires indicatifs f):src/main.ml
 =======
   (* Laisser la fenêtre ouverte jusqu'à ce qu'une touche soit pressée *)
   print_endline "Programme terminé. Appuyez sur une touche pour fermer.";
+=======
+  (* Laisser la fenêtre open jusqu'à ce qu'une touche soit pressée *)
+  print_endline "Programme terminé. Appuyez sur une touche du clavier pour fermer.";
+>>>>>>> 181c66a (Logique exécution des programmes (pb de repeat résolu), reste affichage):src/main.ml
   ignore (Graphics.read_key ());
   Graphics.close_graph ();
 >>>>>>> c3b4855 (Pb de bloquage fenêtre trouvé, juste pb d'affichage):src/main.ml
