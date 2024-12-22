@@ -23,6 +23,7 @@ let execute_step state =
   | instr :: rest ->
       let new_position, new_program = match instr with
 <<<<<<< HEAD:lib/exec.ml
+<<<<<<< HEAD:lib/exec.ml
         | Move transform -> Geo.transform transform state.position, rest (* Cas Move: juste transform la position *)
         | Repeat (n, sub_prog) ->  (* Cas Repeat: on répète n fois le programme avant de return la position de fin ? *)
           if n > 1 then
@@ -33,6 +34,12 @@ let execute_step state =
           if n > 1 then
             state.position, [Interp.Repeat (n - 1, sub_prog)] @ rest
 >>>>>>> 181c66a (Logique exécution des programmes (pb de repeat résolu), reste affichage):src/exec.ml
+=======
+        | Move transform -> Geo.transform transform state.position, rest (* Cas Move: juste transform la position *)
+        | Repeat (n, sub_prog) ->  (* Cas Repeat: on répète n fois le programme avant de return la position de fin ? *)
+          if n > 1 then
+            state.position, [Repeat (n - 1, sub_prog)] @ rest
+>>>>>>> dfe4a0c (des ptits trucs):src/exec.ml
           else
             state.position, rest
         | Either (choice1, choice2) -> (* Cas Either: choix 1 mis par défaut, implémenter random après ? *)
