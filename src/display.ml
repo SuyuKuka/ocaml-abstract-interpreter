@@ -130,7 +130,17 @@ let configure_display (cmd : command) : unit =
   let () = 
     match List.find_opt (fun opt -> opt.name = "-cr") cmd.options with
     | Some _ -> draw_point width height 100 cmd
-    | None -> ()
-  in ignore (read_key ());
-  close_graph ()
+    | None -> ().
+;;
+
+let close () = 
+  print_endline "Programme terminé. Appuyez sur une touche du clavier pour fermer.";
+  ignore (Graphics.read_key ());
+  Graphics.close_graph ();
+;;
+
+let close () = 
+  print_endline "Programme terminé. Appuyez sur une touche du clavier pour fermer.";
+  ignore (Graphics.read_key ());
+  Graphics.close_graph ();
 ;;
