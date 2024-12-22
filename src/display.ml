@@ -76,9 +76,6 @@ let init_window (width : int) (height : int) (cmd : command) : unit =
   in set_color (rgb r g b);
 
   draw_axes width height 100;
-
-  (*ignore (read_key ());
-  close_graph () *)
 ;;
 
 let configure_display (cmd : command) : unit =
@@ -113,4 +110,10 @@ let configure_display (cmd : command) : unit =
   match List.find_opt (fun opt -> opt.name = "-cr") cmd.options with
   | Some _ -> draw_point 0 0 
   | None -> ();
+;;
+
+let close () = 
+  print_endline "Programme terminé. Appuyez sur une touche du clavier pour fermer.";
+  ignore (Graphics.read_key ());
+  Graphics.close_graph ();
 ;;
