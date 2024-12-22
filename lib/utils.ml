@@ -12,7 +12,7 @@ let program1 () : program =
 
 let program2 () : program = 
   [
-    Repeat (10, 
+    Repeat (3, 
       [
         Move (
           Translate (
