@@ -103,7 +103,10 @@ let configure_display (cmd : command) : unit =
     | None -> (1500, 900)
   in init_window width height cmd;
 
-  let (x_min, y_min, x_max, y_max) =
+  if List.length cmd.options = 0 then
+    draw_point width height 100 cmd;
+
+  let () =
     match List.find_opt (fun opt -> opt.name = "-abs") cmd.options with
     | Some abs_option -> 
       (match abs_option.arguments with
@@ -115,16 +118,15 @@ let configure_display (cmd : command) : unit =
           if not (x_min <= 0 && 0 <= x_max && y_min <= 0 && 0 <= y_max) then
             failwith "Rectangle must contain (0,0)"
           else
-            (x_min, y_min, x_max, y_max)
+            draw_rectangle { 
+              x_min = float_of_int (x_min + width / 2); 
+              x_max = float_of_int (x_max + width / 2); 
+              y_min = float_of_int (y_min + height / 2); 
+              y_max = float_of_int (y_max + height / 2); 
+            } 100 cmd;
         | _ -> failwith "Invalid arguments for -abs")
-    | None -> (0, 0, 100, 100) 
-  in draw_rectangle { 
-      x_min = float_of_int (x_min + width / 2); 
-      x_max = float_of_int (x_max + width / 2); 
-      y_min = float_of_int (y_min + height / 2); 
-      y_max = float_of_int (y_max + height / 2); 
-    } 100 cmd;
-
+    | None -> ()
+  in 
   let () = 
     match List.find_opt (fun opt -> opt.name = "-cr") cmd.options with
     | Some _ -> draw_point width height 100 cmd
