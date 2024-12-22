@@ -57,7 +57,7 @@ let rec parse_options options : option list =
       | "-cr" -> extract_opt 0 rest
       | "-bc" -> extract_opt 3 rest
       | "-fc" -> extract_opt 3 rest
-      | "-rc" -> extract_opt 3 rest
+      | "-rc" -> extract_opt 4 rest
       | "-pc" -> extract_opt 3 rest
       | "-size" -> extract_opt 2 rest
       | _ -> failwith (opt ^ ": option not found")
