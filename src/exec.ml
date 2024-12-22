@@ -16,15 +16,22 @@ let init_state (prog : program) (p : point) : state =
   }
 ;;
 
-(* let execute_step state =
-  match state.remaining with
+let execute_step state =
+  match state.program with
   | [] -> None
   | instr :: rest ->
-      let new_position = match instr with
-        | Interp.Move transform -> Geo.transform transform state.position
-        | _ -> state.position (* Gérer Repeat et Either *)
+      let new_position, new_program = match instr with
+        | Interp.Move transform -> Geo.transform transform state.position, rest
+        | Interp.Repeat (n, sub_prog) ->
+          if n>1 then
+            let repeated = Interp.Repeat(n-1, sub_prog) in
+            state.position, sub_prog @ (repeated :: rest)
+          else
+            state.position, rest
+        | Interp.Either (choice1, choice2) ->
+          state.position, choice1 @ rest
       in
-      let new_state = { state with position = new_position; remaining = rest } in
+      let new_state = { state with position = new_position; program = new_program } in
       Some new_state
 ;;
 
@@ -33,7 +40,10 @@ let rec run_program state delay =
   | None -> () 
   | Some new_state ->
     Graphics.clear_graph ();
-    (* draw_point new_state.position; *)
+    Display.draw_point 
+      (int_of_float new_state.position.x)
+      (int_of_float new_state.position.y);
+
     Unix.sleepf delay;
     run_program new_state delay
-;; *)
+;;
