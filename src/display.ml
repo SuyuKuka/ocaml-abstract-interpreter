@@ -77,8 +77,8 @@ let init_window (width : int) (height : int) (cmd : command) : unit =
 
   draw_axes width height 100;
 
-  ignore (read_key ());
-  close_graph ()
+  (*ignore (read_key ());
+  close_graph () *)
 ;;
 
 let configure_display (cmd : command) : unit =
