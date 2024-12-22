@@ -35,21 +35,19 @@ let execute_step state =
       Some new_state
 ;;
 
-let rec run_program state delay = (* try catch pour error graphics useless désormais *)
-  try
-    match execute_step state with
-    | None -> () (* Programme fini *)
-    | Some new_state -> (* Draw que si la fenêtre est ouverte *)
-        (* clear_graph (); *)
-        print_endline "Exécution d'une étape du prog :";
-        draw_point 
-          (int_of_float new_state.position.x)
-          (int_of_float new_state.position.y);
-
-        Unix.sleepf delay;
-        run_program new_state delay
-  with
-  | Graphic_failure _ -> 
-      print_endline "Erreur graphique : la fenêtre a été fermée.";
-      ()
+let rec run_program (state : state) (delay : float) (cmd : Read.command) : unit = 
+  match execute_step state with
+  | None -> () 
+  | Some new_state -> 
+      print_endline "Exécution d'une étape du prog :";
+      Unix.sleepf delay;
+      let display = configure_display cmd true
+      in 
+      let (x, y) =
+        ( 
+          ((new_state.position.x *. 2.) *. float_of_int display.scale) +. float_of_int display.width,
+          ((new_state.position.y *. 2.) *. float_of_int display.scale) +. float_of_int display.height
+        )
+      in draw_point (int_of_float x) (int_of_float y) display.scale cmd;
+      run_program new_state delay cmd
 ;;
