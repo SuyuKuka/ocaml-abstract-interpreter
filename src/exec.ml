@@ -16,16 +16,15 @@ let init_state (prog : program) (p : point) : state =
   }
 ;;
 
-let execute_step state = (* Check si étapes bien réalisées, rajouter logs ? *)
+let execute_step state =
   match state.program with
   | [] -> None
   | instr :: rest ->
       let new_position, new_program = match instr with
         | Interp.Move transform -> Geo.transform transform state.position, rest (* Cas Move: juste transform la position *)
-        | Interp.Repeat (n, sub_prog) ->  (* Cas Repeat: on répète n fois le programme avant de return la position de fin *)
+        | Interp.Repeat (n, sub_prog) ->  (* Cas Repeat: on répète n fois le programme avant de return la position de fin ? *)
           if n > 1 then
-            let repeated = Interp.Repeat(n-1, sub_prog) in
-            state.position, sub_prog @ (repeated :: rest)
+            state.position, [Interp.Repeat (n - 1, sub_prog)] @ rest
           else
             state.position, rest
         | Interp.Either (choice1, choice2) -> (* Cas Either: choix 1 mis par défaut, implémenter random après ? *)
@@ -35,7 +34,7 @@ let execute_step state = (* Check si étapes bien réalisées, rajouter logs ? *
       Some new_state
 ;;
 
-let rec run_program state delay = (* fait de Graphics.clear_graph casse tout ou bad logique d'exec ? *)
+let rec run_program state delay = (* try catch pour error graphics useless désormais *)
   try
     match execute_step state with
     | None -> () (* Programme fini *)
