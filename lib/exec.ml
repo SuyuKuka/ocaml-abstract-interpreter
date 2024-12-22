@@ -35,15 +35,21 @@ let execute_step state = (* Check si étapes bien réalisées, rajouter logs ? *
       Some new_state
 ;;
 
-let rec run_program state delay = (* fait de Graphics.clear_graph nique tout ou bad logique d'exe ? *)
-  match execute_step state with
-  | None -> () 
-  | Some new_state ->
-    Graphics.clear_graph ();
-    Display.draw_point 
-      (int_of_float new_state.position.x)
-      (int_of_float new_state.position.y);
+let rec run_program state delay = (* fait de Graphics.clear_graph casse tout ou bad logique d'exec ? *)
+  try
+    match execute_step state with
+    | None -> () (* Programme fini *)
+    | Some new_state -> (* Draw que si la fenêtre est ouverte *)
+        (*Graphics.clear_graph ();*)
+        print_endline "Exécution d'une étape du prog :";
+        Display.draw_point 
+          (int_of_float new_state.position.x)
+          (int_of_float new_state.position.y);
 
-    Unix.sleepf delay;
-    run_program new_state delay
+        Unix.sleepf delay;
+        run_program new_state delay
+  with
+  | Graphics.Graphic_failure _ -> 
+      print_endline "Erreur graphique : la fenêtre a été fermée.";
+      ()
 ;;
