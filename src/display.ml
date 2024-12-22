@@ -2,6 +2,12 @@ open Graphics;;
 open Read;;
 open Geo;;
 
+type display = {
+  width : int;
+  height : int;
+  scale : int;
+}
+
 let draw_axes (width : int) (height : int) (scale : int) : unit =
   let center_x = width / 2 in
   let center_y = height / 2 in
@@ -36,7 +42,7 @@ let draw_axes (width : int) (height : int) (scale : int) : unit =
   moveto (center_x + 10) (center_y - 10)
 ;;
 
-let draw_point (width : int) (height : int) (scale : int) (cmd : command) : unit =
+let draw_point (x : int) (y : int) (scale : int) (cmd : command) : unit =
   let (r, g, b) = 
     match List.find_opt (fun opt -> opt.name = "-pc") cmd.options with
     | Some color_option -> 
@@ -45,7 +51,7 @@ let draw_point (width : int) (height : int) (scale : int) (cmd : command) : unit
       | _ -> failwith "Invalid arguments for -pc")
     | None -> (255, 0, 0)
   in set_color (rgb r g b);
-  fill_circle (width / 2) (height / 2) (scale / 25);
+  fill_circle (x / 2) (y / 2) (scale / 25);
 ;;
 
 let draw_rectangle (rect : rectangle) (scale : int) (cmd : command) : unit =
@@ -70,9 +76,14 @@ let draw_rectangle (rect : rectangle) (scale : int) (cmd : command) : unit =
     (int_of_float (rect.y_max -. rect.y_min))
 ;;
 
-let init_window (width : int) (height : int) (cmd : command) : unit =
-  open_graph (" " ^ string_of_int width ^ "x" ^ string_of_int height);
-  set_window_title "Exécution pas à pas du programme";
+let init_window (width : int) (height : int) (cmd : command) (window : bool) : unit =
+  let () =
+    if window then 
+      clear_graph () 
+    else 
+      open_graph (" " ^ string_of_int width ^ "x" ^ string_of_int height);
+  in set_window_title "Exécution pas à pas du programme";
+
   let (r, g, b) = match List.find_opt (fun opt -> opt.name = "-bc") cmd.options with
     | Some color_option -> 
       (match color_option.arguments with
@@ -93,18 +104,19 @@ let init_window (width : int) (height : int) (cmd : command) : unit =
   draw_axes width height 100;
 ;;
 
-let configure_display (cmd : command) : unit =
-  let (width, height) =
+let configure_display (cmd : command) (window : bool) : display =
+  let display =
     match List.find_opt (fun opt -> opt.name = "-size") cmd.options with
     | Some size_option -> 
       (match size_option.arguments with
-      | [w; h] -> (int_of_string w, int_of_string h)
+      | [w; h] -> { width = (int_of_string w); height = (int_of_string h); scale = 100 }
       | _ -> failwith "Invalid arguments for -size")
-    | None -> (1500, 900)
-  in init_window width height cmd;
+    | None -> { width = 1500; height = 900; scale = 100 }
+  in init_window display.width display.height cmd window;
 
-  if List.length cmd.options = 0 then
-    draw_point width height 100 cmd;
+  if not window then
+    if List.length cmd.options = 0 then
+      draw_point display.width display.height display.scale cmd;
 
   let () =
     match List.find_opt (fun opt -> opt.name = "-abs") cmd.options with
@@ -119,20 +131,21 @@ let configure_display (cmd : command) : unit =
             failwith "Rectangle must contain (0,0)"
           else
             draw_rectangle { 
-              x_min = float_of_int (x_min + width / 2); 
-              x_max = float_of_int (x_max + width / 2); 
-              y_min = float_of_int (y_min + height / 2); 
-              y_max = float_of_int (y_max + height / 2); 
-            } 100 cmd;
+              x_min = float_of_int (x_min + display.width / 2); 
+              x_max = float_of_int (x_max + display.width / 2); 
+              y_min = float_of_int (y_min + display.height / 2); 
+              y_max = float_of_int (y_max + display.height / 2); 
+            } display.scale cmd;
         | _ -> failwith "Invalid arguments for -abs")
-    | None -> (0, 0, 100, 100) 
+    | None -> ()
   in
-    if x_min <> 0 && y_min <> 0 && x_max <> 0 && y_max <> 0 then
-      draw_rectangle { x_min = float_of_int x_min; x_max = float_of_int x_max; y_min = float_of_int y_min; y_max = float_of_int y_max };
-
-  match List.find_opt (fun opt -> opt.name = "-cr") cmd.options with
-  | Some _ -> draw_point 0 0 
-  | None -> ();
+  let () = 
+    match List.find_opt (fun opt -> opt.name = "-cr") cmd.options with
+    | Some _ -> draw_point display.width display.height display.scale cmd 
+    | None -> ()
+  in (); 
+  
+  display;
 ;;
 
 let close () = 
