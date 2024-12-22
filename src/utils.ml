@@ -16,7 +16,7 @@ let program2 () : program =
       [
         Move (
           Translate (
-            { x = 0.5; y = 1. }
+            { x = 1.; y = 1. }
           )
         )
       ]

@@ -23,13 +23,33 @@ let execute_step state =
   | instr :: rest ->
       let new_position, new_program = match instr with
         | Move transform -> Geo.transform transform state.position, rest (* Cas Move: juste transform la position *)
-        | Repeat (n, sub_prog) ->  (* Cas Repeat: on répète n fois le programme avant de return la position de fin ? *)
-          if n > 1 then
-            state.position, [Repeat (n - 1, sub_prog)] @ rest
-          else
-            state.position, rest
-        | Either (choice1, choice2) -> (* Cas Either: choix 1 mis par défaut, implémenter random après ? *)
-          state.position, choice1 @ rest
+        | Repeat (n, sub_prog) when n > 1 -> ( (* Cas Repeat: à fix pour qu'il reconnaisse le cas où c'est Either | print_endline "Repeat reconnu"; *)
+            match sub_prog with
+            | [] -> state.position, rest (* Sous-programme vide, on saute *)
+            | first_instr :: remaining_sub_prog -> (* Exécute direct la 1ère instruction du sous-programme *)
+                let intermediate_position = 
+                  match first_instr with
+                  | Move transform -> Geo.transform transform state.position
+                  | _ -> state.position
+                in (* Réinsère les instructions restantes du Repeat *)
+                intermediate_position, remaining_sub_prog @ [Repeat (n - 1, sub_prog)] @ rest
+          )
+        | Repeat (_, sub_prog) -> ( (* Dernière itération : exécute uniquement le sous-programme restant *)
+            match sub_prog with
+            | [] -> state.position, rest
+            | first_instr :: remaining_sub_prog ->
+                let intermediate_position =
+                  match first_instr with
+                  | Move transform -> Geo.transform transform state.position
+                  | _ -> state.position
+                in
+                intermediate_position, remaining_sub_prog @ rest
+          )
+        | Either (choice1, choice2) -> 
+          if Random.bool () then 
+            state.position, choice1 @ rest 
+          else 
+            state.position, choice2 @ rest
       in
       let new_state = { state with position = new_position; program = new_program } in
       Some new_state
@@ -49,5 +69,6 @@ let rec run_program (state : state) (delay : float) (cmd : Read.command) : unit 
           ((new_state.position.y *. 2.) *. float_of_int display.scale) +. float_of_int display.height
         )
       in draw_point (int_of_float x) (int_of_float y) display.scale cmd;
+      Printf.printf "Position du robot : (%f, %f)\n" new_state.position.x new_state.position.y;
       run_program new_state delay cmd
 ;;
