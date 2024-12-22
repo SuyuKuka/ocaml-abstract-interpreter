@@ -125,18 +125,14 @@ let configure_display (cmd : command) : unit =
               y_max = float_of_int (y_max + height / 2); 
             } 100 cmd;
         | _ -> failwith "Invalid arguments for -abs")
-    | None -> ()
-  in 
-  let () = 
-    match List.find_opt (fun opt -> opt.name = "-cr") cmd.options with
-    | Some _ -> draw_point width height 100 cmd
-    | None -> ().
-;;
+    | None -> (0, 0, 100, 100) 
+  in
+    if x_min <> 0 && y_min <> 0 && x_max <> 0 && y_max <> 0 then
+      draw_rectangle { x_min = float_of_int x_min; x_max = float_of_int x_max; y_min = float_of_int y_min; y_max = float_of_int y_max };
 
-let close () = 
-  print_endline "Programme terminé. Appuyez sur une touche du clavier pour fermer.";
-  ignore (Graphics.read_key ());
-  Graphics.close_graph ();
+  match List.find_opt (fun opt -> opt.name = "-cr") cmd.options with
+  | Some _ -> draw_point 0 0 
+  | None -> ();
 ;;
 
 let close () = 
