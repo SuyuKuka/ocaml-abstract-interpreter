@@ -16,7 +16,8 @@ let draw_axes (width : int) (height : int) (scale : int) : unit =
       moveto x (center_y - 5);
       lineto x (center_y + 5);
       moveto (x - 5) (center_y - 25);
-      let value = float_of_int ((x - center_x) / scale) in
+      let value = float_of_int ((x - center_x) / scale) 
+      in
       if x <> center_x then draw_string (string_of_float value)
     )
   done;
@@ -26,7 +27,8 @@ let draw_axes (width : int) (height : int) (scale : int) : unit =
       moveto (center_x - 5) y;
       lineto (center_x + 5) y;
       moveto (center_x - 25) y;
-      let value = float_of_int ((y - center_y) / scale) in
+      let value = float_of_int ((y - center_y) / scale) 
+      in
       if y <> center_y then draw_string (string_of_float value)
     )
   done;
@@ -51,8 +53,8 @@ let draw_rectangle (rect : rectangle) (scale : int) (cmd : command) : unit =
     match List.find_opt (fun opt -> opt.name = "-rc") cmd.options with
     | Some color_option -> 
       (match color_option.arguments with
-        | [r; g; b] -> (int_of_string r, int_of_string g, int_of_string b)
-        | _ -> failwith "Invalid arguments for -rc")
+      | [r; g; b] -> (int_of_string r, int_of_string g, int_of_string b)
+      | _ -> failwith "Invalid arguments for -rc")
     | None -> (255, 100, 100)
   in set_color (rgb r g b);
   draw_rect
@@ -74,19 +76,18 @@ let init_window (width : int) (height : int) (cmd : command) : unit =
   let (r, g, b) = match List.find_opt (fun opt -> opt.name = "-bc") cmd.options with
     | Some color_option -> 
       (match color_option.arguments with
-        | [r; g; b] -> (int_of_string r, int_of_string g, int_of_string b)
-        | _ -> failwith "Invalid arguments for -bc")
+      | [r; g; b] -> (int_of_string r, int_of_string g, int_of_string b)
+      | _ -> failwith "Invalid arguments for -bc")
     | None -> (255, 255, 255)
-  in 
-  let background_color = rgb r g b 
+  in let background_color = rgb r g b 
   in set_color background_color; 
   fill_rect 0 0 width height;
 
   let (r, g, b) = match List.find_opt (fun opt -> opt.name = "-fc") cmd.options with
     | Some color_option -> 
       (match color_option.arguments with
-        | [r; g; b] -> (int_of_string r, int_of_string g, int_of_string b)
-        | _ -> failwith "Invalid arguments for -fc")
+      | [r; g; b] -> (int_of_string r, int_of_string g, int_of_string b)
+      | _ -> failwith "Invalid arguments for -fc")
     | None -> (0, 0, 0)
   in set_color (rgb r g b);
   draw_axes width height 100;
@@ -97,8 +98,8 @@ let configure_display (cmd : command) : unit =
     match List.find_opt (fun opt -> opt.name = "-size") cmd.options with
     | Some size_option -> 
       (match size_option.arguments with
-        | [w; h] -> (int_of_string w, int_of_string h)
-        | _ -> failwith "Invalid arguments for -size")
+      | [w; h] -> (int_of_string w, int_of_string h)
+      | _ -> failwith "Invalid arguments for -size")
     | None -> (1500, 900)
   in init_window width height cmd;
 
