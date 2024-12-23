@@ -113,37 +113,6 @@ let configure_display (cmd : command) (window : bool) : display =
       | _ -> failwith "Invalid arguments for -size")
     | None -> { width = 1500; height = 900; scale = 100 }
   in init_window display.width display.height cmd window;
-
-  if not window then
-    if List.length cmd.options = 0 then
-      draw_point display.width display.height display.scale cmd;
-
-  let () =
-    match List.find_opt (fun opt -> opt.name = "-abs") cmd.options with
-    | Some abs_option -> 
-      (match abs_option.arguments with
-      | [x_min; y_min; x_max; y_max] -> 
-          let x_min = int_of_string x_min
-          and y_min = int_of_string y_min
-          and x_max = int_of_string x_max
-          and y_max = int_of_string y_max in
-          if not (x_min <= 0 && 0 <= x_max && y_min <= 0 && 0 <= y_max) then
-            failwith "Rectangle must contain (0,0)"
-          else
-            draw_rectangle { 
-              x_min = float_of_int (x_min + display.width / 2); 
-              x_max = float_of_int (x_max + display.width / 2); 
-              y_min = float_of_int (y_min + display.height / 2); 
-              y_max = float_of_int (y_max + display.height / 2); 
-            } display.scale cmd;
-        | _ -> failwith "Invalid arguments for -abs")
-    | None -> ()
-  in
-  let () = 
-    match List.find_opt (fun opt -> opt.name = "-cr") cmd.options with
-    | Some _ -> draw_point display.width display.height display.scale cmd 
-    | None -> ()
-  in (); 
   
   display;
 ;;
