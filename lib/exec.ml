@@ -26,6 +26,7 @@ let execute_step state =
 <<<<<<< HEAD:lib/exec.ml
         | Move transform -> Geo.transform transform state.position, rest (* Cas Move: juste transform la position *)
 <<<<<<< HEAD:lib/exec.ml
+<<<<<<< HEAD:lib/exec.ml
         | Repeat (n, sub_prog) ->  (* Cas Repeat: on répète n fois le programme avant de return la position de fin ? *)
           if n > 1 then
             state.position, [Repeat (n - 1, sub_prog)] @ rest
@@ -74,6 +75,55 @@ let execute_step state =
           else 
             state.position, choice2 @ rest
 >>>>>>> cd48240 (Fix Repeat solo; à fix Either dans Repeat):src/exec.ml
+=======
+        | Repeat (n, sub_prog) when n > 1 -> (* Cas Repeat: gère les n répétitions et sous-cas des itérations *)
+          (match sub_prog with
+          | [] -> state.position, rest (* Sous-programme vide, on saute *)
+          | first_instr :: remaining_sub_prog -> (* Évalue explicitement la première instruction du sous-programme *)
+              let intermediate_position, updated_sub_prog = 
+                match first_instr with
+                | Move transform -> 
+                    Geo.transform transform state.position, remaining_sub_prog
+                | Either (choice1, choice2) -> 
+                    let selected_choice = if Random.bool () then choice1 else choice2 in
+                    (match selected_choice with
+                    | [] -> state.position, remaining_sub_prog
+                    | choice_first :: choice_rest ->
+                        (match choice_first with
+                        | Move transform -> Geo.transform transform state.position, choice_rest @ remaining_sub_prog
+                        | _ -> state.position, remaining_sub_prog))
+                | _ -> state.position, remaining_sub_prog
+              in (* Réinsérer la répétition avec n - 1 itérations restantes *)
+              intermediate_position, updated_sub_prog @ [Repeat (n - 1, sub_prog)] @ rest)
+
+      | Repeat (_, sub_prog) -> (* Dernière itération : exécuter uniquement le sous-programme restant *)
+          (match sub_prog with
+          | [] -> state.position, rest
+          | first_instr :: remaining_sub_prog -> 
+              let intermediate_position, updated_sub_prog = 
+                match first_instr with
+                | Move transform -> 
+                    Geo.transform transform state.position, remaining_sub_prog
+                | Either (choice1, choice2) -> 
+                    let selected_choice = if Random.bool () then choice1 else choice2 in
+                    (match selected_choice with
+                    | [] -> state.position, remaining_sub_prog
+                    | choice_first :: choice_rest ->
+                        (match choice_first with
+                        | Move transform -> Geo.transform transform state.position, choice_rest @ remaining_sub_prog
+                        | _ -> state.position, remaining_sub_prog))
+                | _ -> state.position, remaining_sub_prog
+              in
+              intermediate_position, updated_sub_prog @ rest)
+      | Either (choice1, choice2) -> (* Cas Either: choix random entre choice1 et choice2 *)
+          let selected_choice = if Random.bool () then choice1 else choice2 in
+            (match selected_choice with
+              | [] -> state.position, rest
+              | first_instr :: remaining_choice -> 
+                (match first_instr with
+                  | Move transform -> Geo.transform transform state.position, remaining_choice @ rest
+                  | _ -> state.position, remaining_choice @ rest))
+>>>>>>> 8aaaf21 (Fix du fonctionnement de Either et Either dans Repeat):src/exec.ml
       in
       let new_state = { state with position = new_position; program = new_program } in
       Some new_state
