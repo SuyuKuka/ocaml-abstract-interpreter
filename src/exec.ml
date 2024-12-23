@@ -169,7 +169,7 @@ let rec run_program (state : state) (delay : float) (cmd : Read.command) : unit 
   match execute_step state with
   | None -> () 
   | Some new_state -> 
-      print_endline "Exécution d'une étape du prog :";
+      print_endline "- Exécution d'une étape du programme -";
       Unix.sleepf delay;
       let display = configure_display cmd true
       in 
@@ -187,7 +187,7 @@ let rec run_program_rect (state_rect : state_rect) (delay : float) (cmd : Read.c
   match execute_step_rect state_rect with
   | None -> () 
   | Some new_state -> 
-    print_endline "Exécution d'une étape du prog :";
+    print_endline "- Exécution d'une étape du programme -";
     Unix.sleepf delay;
     let display = configure_display cmd true
     in 
