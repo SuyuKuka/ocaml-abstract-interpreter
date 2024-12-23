@@ -79,6 +79,10 @@ let target_reached_rect (prog : program) (r : rectangle) (target : rectangle) : 
     in aux (all_choices prog) r target
 ;;
 
+(** 5.5 | run_polymorphe : (transformation -> 'a -> 'a) -> program -> 'a -> 'a list
+  * Simule l'exécution des deux fonctions de run selon la transformation donnée en argument.
+  * (Soit 'run' si appel de run_polymorphe transform, soit 'run_rect' si appel de run_polymorphe transform_rect)
+  *)
 let run_polymorphe (transform : transformation -> 'a -> 'a) (prog : program) (i : 'a) : 'a list =
   let rec aux (prog : program) (state : 'a) (states : 'a list) : 'a list =
     match prog with
@@ -100,6 +104,10 @@ let run_polymorphe (transform : transformation -> 'a -> 'a) (prog : program) (i 
   in List.rev (aux prog i [i]) (* Inverse la liste pour return les états dans le bon ordre *)
 ;;
 
+(** 5.6 | over_approximate : program -> rectangle -> rectangle
+    * Renvoie le rectangle représentant la sur-approximation des états atteignables par le robot via
+    * l'exécution du programme 'prog' sur le rectangle 'r'.
+    *)
 let rec over_approximate (prog : program) (r : rectangle) : rectangle =
   let rec aux (prog : program) (r : rectangle) : rectangle =
     match prog with
@@ -131,6 +139,10 @@ let rec over_approximate (prog : program) (r : rectangle) : rectangle =
   aux prog r (* Appelle la fonction aux avec programme complet & rectangle initial *)
 ;;
 
+(** 5.7 | feasible_target_reached : program -> rectangle -> rectangle ->
+    * Vérifie par sur-approximation si les états finaux du rectangle 'r' seront inclus dans le rectangle 'target'
+    * à l'issue du programme 'prog'.
+    *)
 let feasible_target_reached (prog : program) (r : rectangle) (target : rectangle) : bool =
   let r_final = over_approximate prog r in
   (* Check si un rectangle est inclus dans un autre *)
