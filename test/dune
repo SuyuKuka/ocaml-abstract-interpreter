@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 (tests
   (names test)
 <<<<<<< HEAD
@@ -9,3 +10,11 @@
 >>>>>>> c6c7aeb (sujet + readline pour l'interpreteur + implementation du graphics dans le projet)
 )
 
+=======
+(tests
+  (names test)
+  (libraries fmt alcotest pf5 graphics)
+  (flags (:standard -open Pf5))
+)
+
+>>>>>>> 62e73c5 (Modifications dans fichier1.txt)
