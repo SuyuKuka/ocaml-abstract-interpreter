@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 _build
 _opam
 pf5.opam
 *~
+=======
+_opam
+_build
+>>>>>>> 62e73c5 (Modifications dans fichier1.txt)
