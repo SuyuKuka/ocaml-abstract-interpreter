@@ -45,12 +45,14 @@ let main () =
             failwith "Rectangle must contain (0,0)"
           else
             draw_rectangle { 
-              x_min = float_of_int (x_min + display.width / 2); 
-              x_max = float_of_int (x_max + display.width / 2); 
-              y_min = float_of_int (y_min + display.height / 2); 
-              y_max = float_of_int (y_max + display.height / 2); 
+              x_min = float_of_int (x_min * display.scale + display.width / 2); 
+              x_max = float_of_int (x_max * display.scale + display.width / 2); 
+              y_min = float_of_int (y_min * display.scale + display.height / 2); 
+              y_max = float_of_int (y_max * display.scale + display.height / 2); 
             } display.scale command;
-          | _ -> failwith "Invalid arguments for -abs")
+          let initial_state_rect = init_state_rect selected_prog { x_min = float_of_int x_min; x_max = float_of_int x_max; y_min = float_of_int y_min; y_max = float_of_int y_max } 
+          in run_program_rect initial_state_rect 1. command;
+        | _ -> failwith "Invalid arguments for -abs")
       | None -> ();
     in ();
   );
