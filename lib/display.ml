@@ -113,6 +113,7 @@ let configure_display (cmd : command) (window : bool) : display =
       | _ -> failwith "Invalid arguments for -size")
     | None -> { width = 1500; height = 900; scale = 100 }
   in init_window display.width display.height cmd window;
+<<<<<<< HEAD:lib/display.ml
 
   if not window then
     if List.length cmd.options = 0 then
@@ -157,6 +158,8 @@ let close () =
     | Some _ -> draw_point display.width display.height display.scale cmd 
     | None -> ()
   in (); 
+=======
+>>>>>>> 45901c6 (fix option, manque que l'exec rectangle):src/display.ml
   
   display;
 >>>>>>> 090ed73 (affiche les points):src/display.ml
