@@ -23,33 +23,53 @@ let execute_step state =
   | instr :: rest ->
       let new_position, new_program = match instr with
         | Move transform -> Geo.transform transform state.position, rest (* Cas Move: juste transform la position *)
-        | Repeat (n, sub_prog) when n > 1 -> ( (* Cas Repeat: à fix pour qu'il reconnaisse le cas où c'est Either | print_endline "Repeat reconnu"; *)
-            match sub_prog with
-            | [] -> state.position, rest (* Sous-programme vide, on saute *)
-            | first_instr :: remaining_sub_prog -> (* Exécute direct la 1ère instruction du sous-programme *)
-                let intermediate_position = 
-                  match first_instr with
-                  | Move transform -> Geo.transform transform state.position
-                  | _ -> state.position
-                in (* Réinsère les instructions restantes du Repeat *)
-                intermediate_position, remaining_sub_prog @ [Repeat (n - 1, sub_prog)] @ rest
-          )
-        | Repeat (_, sub_prog) -> ( (* Dernière itération : exécute uniquement le sous-programme restant *)
-            match sub_prog with
-            | [] -> state.position, rest
-            | first_instr :: remaining_sub_prog ->
-                let intermediate_position =
-                  match first_instr with
-                  | Move transform -> Geo.transform transform state.position
-                  | _ -> state.position
-                in
-                intermediate_position, remaining_sub_prog @ rest
-          )
-        | Either (choice1, choice2) -> 
-          if Random.bool () then 
-            state.position, choice1 @ rest 
-          else 
-            state.position, choice2 @ rest
+        | Repeat (n, sub_prog) when n > 1 -> (* Cas Repeat: gère les n répétitions et sous-cas des itérations *)
+          (match sub_prog with
+          | [] -> state.position, rest (* Sous-programme vide, on saute *)
+          | first_instr :: remaining_sub_prog -> (* Évalue explicitement la première instruction du sous-programme *)
+              let intermediate_position, updated_sub_prog = 
+                match first_instr with
+                | Move transform -> 
+                    Geo.transform transform state.position, remaining_sub_prog
+                | Either (choice1, choice2) -> 
+                    let selected_choice = if Random.bool () then choice1 else choice2 in
+                    (match selected_choice with
+                    | [] -> state.position, remaining_sub_prog
+                    | choice_first :: choice_rest ->
+                        (match choice_first with
+                        | Move transform -> Geo.transform transform state.position, choice_rest @ remaining_sub_prog
+                        | _ -> state.position, remaining_sub_prog))
+                | _ -> state.position, remaining_sub_prog
+              in (* Réinsérer la répétition avec n - 1 itérations restantes *)
+              intermediate_position, updated_sub_prog @ [Repeat (n - 1, sub_prog)] @ rest)
+
+      | Repeat (_, sub_prog) -> (* Dernière itération : exécuter uniquement le sous-programme restant *)
+          (match sub_prog with
+          | [] -> state.position, rest
+          | first_instr :: remaining_sub_prog -> 
+              let intermediate_position, updated_sub_prog = 
+                match first_instr with
+                | Move transform -> 
+                    Geo.transform transform state.position, remaining_sub_prog
+                | Either (choice1, choice2) -> 
+                    let selected_choice = if Random.bool () then choice1 else choice2 in
+                    (match selected_choice with
+                    | [] -> state.position, remaining_sub_prog
+                    | choice_first :: choice_rest ->
+                        (match choice_first with
+                        | Move transform -> Geo.transform transform state.position, choice_rest @ remaining_sub_prog
+                        | _ -> state.position, remaining_sub_prog))
+                | _ -> state.position, remaining_sub_prog
+              in
+              intermediate_position, updated_sub_prog @ rest)
+      | Either (choice1, choice2) -> (* Cas Either: choix random entre choice1 et choice2 *)
+          let selected_choice = if Random.bool () then choice1 else choice2 in
+            (match selected_choice with
+              | [] -> state.position, rest
+              | first_instr :: remaining_choice -> 
+                (match first_instr with
+                  | Move transform -> Geo.transform transform state.position, remaining_choice @ rest
+                  | _ -> state.position, remaining_choice @ rest))
       in
       let new_state = { state with position = new_position; program = new_program } in
       Some new_state
