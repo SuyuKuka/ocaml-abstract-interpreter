@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 (lang dune 3.0)
 
 (name pf5)
@@ -64,3 +65,36 @@
   )
 )
 >>>>>>> 62e73c5 (Modifications dans fichier1.txt)
+=======
+(lang dune 3.0)
+
+(name pf5)
+
+(generate_opam_files)
+
+(authors
+  "Clément Allain"
+  "Giovanni Bernardi"
+  "Jérémy Ledent"
+  "Antonio Bucciarelli"
+  "Vincent Padovani"
+)
+(maintainers
+  "clement.allain@inria.fr"
+  "gio@irif.fr"
+  "jeremy.ledent@irif.fr"
+  "buccia@irif.fr"
+  "padovani@irif.fr"
+)
+
+(package
+  (name pf5)
+  (synopsis "Projet PF5")
+  (depends
+    ocaml
+    utop
+    fmt
+    alcotest
+  )
+)
+>>>>>>> d2565a8253cf41a78a0a3095b981e0df89e3652c

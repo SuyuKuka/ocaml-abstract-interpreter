@@ -1,6 +1,14 @@
+<<<<<<< HEAD:lib/dune
 (library
   (name pf5)
   (public_name pf5)
   (libraries fmt graphics)
   (flags (:standard -w A-27-39-33-32))
+=======
+(library
+  (name pf5)
+  (public_name pf5)
+  (libraries fmt graphics)
+  (flags (:standard -w A-27-39-33-32))
+>>>>>>> d2565a8253cf41a78a0a3095b981e0df89e3652c:src/dune
 ) 
