@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 _build
 _opam
 pf5.opam
@@ -7,3 +8,7 @@ pf5.opam
 _opam
 _build
 >>>>>>> 62e73c5 (Modifications dans fichier1.txt)
+=======
+_opam
+_build
+>>>>>>> d2565a8253cf41a78a0a3095b981e0df89e3652c

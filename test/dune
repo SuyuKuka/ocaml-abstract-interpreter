@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 (tests
   (names test)
 <<<<<<< HEAD
@@ -18,3 +19,11 @@
 )
 
 >>>>>>> 62e73c5 (Modifications dans fichier1.txt)
+=======
+(tests
+  (names test)
+  (libraries fmt alcotest pf5 graphics)
+  (flags (:standard -open Pf5))
+)
+
+>>>>>>> d2565a8253cf41a78a0a3095b981e0df89e3652c
