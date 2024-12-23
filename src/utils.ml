@@ -12,11 +12,11 @@ let program1 () : program =
 
 let program2 () : program = 
   [
-    Repeat (10, 
+    Repeat (3, 
       [
         Move (
           Translate (
-            { x = 0.5; y = 1. }
+            { x = 1.; y = 1. }
           )
         )
       ]
